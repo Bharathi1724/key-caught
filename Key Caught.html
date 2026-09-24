@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Key Caught</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@400;500;600&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+:root{--bg:#fff;--fg:#111;--hint:#777;--line:#ddd;--card:#ffe14d;--note2:#fff;--ink:#2b1160;--acc:#e0157a;--ring:#6c2bff;--stamp:#5b21e6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--fg:#f2f2f2;--hint:#8a8a8a;--line:#2a2a2a;--card:#3a1a8f;--note2:#5233c4;--ink:#fff;--acc:#e0157a;--ring:#ffd400;--stamp:#ffd400}}
+:root[data-theme="dark"]{--bg:#000;--fg:#f2f2f2;--hint:#8a8a8a;--line:#2a2a2a;--card:#3a1a8f;--note2:#5233c4;--ink:#fff;--acc:#e0157a;--ring:#ffd400;--stamp:#ffd400}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:'Outfit',system-ui,sans-serif;overflow:hidden}
+.desk{height:100%;display:grid;place-items:center;text-align:center;padding:24px}
+.hint{color:var(--hint);font-size:15px;line-height:1.6;max-width:32ch}
+.hint b{font-weight:600}
+.bar{position:fixed;left:14px;right:150px;top:calc(12px + env(safe-area-inset-top,0px));display:none;gap:8px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--hint);opacity:.6}
+.bar.on{display:flex}
+.bar:hover,.bar:focus-within{opacity:1}
+.bar button{font:inherit;color:inherit;background:none;border:1px solid var(--hint);border-radius:99px;padding:4px 11px;cursor:pointer}
+.bar button.on{background:var(--hint);color:var(--bg)}
+.bar .sp{flex:1}
+button:focus-visible,input:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+
+.card{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));width:min(460px,calc(100vw - 24px));background:var(--card);color:var(--ink);border-radius:28px;padding:30px 28px 28px;box-shadow:0 0 0 3px var(--ring),0 24px 50px rgba(0,0,0,.3);transform:translate(-50%,150%);opacity:0;transition:transform .6s cubic-bezier(.2,1.4,.4,1),opacity .3s;pointer-events:none}
+.card.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.card::before,.card::after{content:"";position:absolute;top:96px;width:22px;height:22px;background:var(--bg2);border-radius:50%;display:none}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--acc);color:#fff;font-weight:600;font-size:14px;padding:6px 16px 6px 12px;border-radius:99px;margin-bottom:16px}
+h2{font-family:'Syne',sans-serif;font-weight:800;font-size:26px;line-height:1.25;margin:0 0 12px}
+p{margin:0 0 20px;font-size:16px;line-height:1.55}
+.mono{font-family:'Courier Prime',monospace}
+kbd{font-family:'Courier Prime',monospace;font-weight:700;background:var(--ink);color:var(--card);padding:1px 10px;border-radius:8px}
+.opts{display:grid;gap:12px}
+.opt{font:inherit;font-weight:500;text-align:left;color:var(--ink);background:var(--note2);border:2px solid var(--ink);border-radius:99px;padding:14px 20px;cursor:pointer;transition:background .15s,color .15s,transform .12s}
+.opt:hover{background:var(--ink);color:var(--card)}
+.opt:active{transform:scale(.97)}
+.tell{display:none;gap:10px;margin-top:16px}.tell.on{display:flex}
+.tell input{flex:1;min-width:0;font:inherit;padding:10px 14px;border:2px solid var(--ink);border-radius:99px;background:transparent;color:var(--ink)}
+.stage{display:none}.stage.on{display:block}
+.file{text-align:center;padding:10px 0 6px}
+.file .ex{font-size:13px;opacity:.7}
+.file .name{font-size:19px;margin:12px 0 26px;line-height:1.5}
+.stamp{display:inline-block;font-family:'Syne',sans-serif;font-weight:800;font-size:30px;color:var(--stamp);border:4px double var(--stamp);border-radius:10px;padding:4px 16px;transform:rotate(-7deg) scale(3);opacity:0}
+.file.on .stamp{animation:thud .45s .15s cubic-bezier(.3,1.6,.5,1) forwards}
+@keyframes thud{to{transform:rotate(-7deg) scale(1);opacity:.95}}
+.card.shake{animation:shake .35s}
+@keyframes shake{25%{translate:-5px 0}75%{translate:5px 0}}
+
+.digest{position:fixed;top:calc(56px + env(safe-area-inset-top,0px));right:14px;width:min(340px,calc(100vw - 28px));max-height:60vh;overflow:auto;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.digest.off{display:none}
+.mr{position:fixed;right:14px;top:calc(12px + env(safe-area-inset-top,0px));font:inherit;font-size:13px;font-weight:600;color:var(--bg);background:var(--fg);border:0;border-radius:99px;padding:7px 14px;cursor:pointer}
+.digest h3{font-family:'Syne',sans-serif;margin:0 0 4px;font-size:18px}
+.digest small{display:block;opacity:.7;margin-bottom:10px;line-height:1.4}
+.row{border-top:1px dashed rgba(127,127,170,.5);padding:8px 0;font-size:14px;line-height:1.4}
+.empty{font-size:14px;opacity:.7}
+@media (prefers-reduced-motion:reduce){.card,.opt{transition:none}.file.on .stamp{animation:none;transform:rotate(-7deg);opacity:.95}}
+</style>
+</head>
+<body>
+<main class="desk"><p class="hint">Nothing to see here.<br>Carry on with your very real work.<br><b>(Try holding any key.)</b></p></main>
+
+<div class="bar" aria-label="Prototype controls">
+  <span>Trigger:</span>
+  <button data-t="5" class="on">5s</button>
+  <button data-t="30">30s</button>
+  <button id="sim">Simulate held key</button>
+</div>
+<button class="mr" id="dg">Manager report</button>
+
+<aside class="digest" id="digest" aria-label="Manager report mock">
+  <h3>Manager report</h3>
+  <small>Mock view. Anonymous, team-level only. No names, no keystroke content, nothing stored beyond the case outcome.</small>
+  <div id="rows"></div>
+</aside>
+
+<section class="card" id="card" role="alertdialog" aria-live="polite" aria-label="Key caught">
+  <div class="stage on" id="s1">
+    <span class="badge">🔍 Key caught!</span>
+    <h2>Holding <kbd id="kn">SPACE</kbd> for <span id="secs">8</span> seconds.</h2>
+    <p>Everything okay?</p>
+    <div class="opts">
+      <button class="opt" data-a="typing">⌨️ I'm actually typing</button>
+      <button class="opt" data-a="object">📦 Something is sitting on my keyboard</button>
+      <button class="opt" data-a="finger">🫠 My finger got stuck</button>
+    </div>
+  </div>
+
+  <div class="stage" id="s2">
+    <span class="badge">🕵️ Possible suspect</span>
+    <h2>An object on your desk.</h2>
+    <p>We don't actually know what it is. Want to tell us?</p>
+    <p class="mono" id="hunch"></p>
+    <div class="opts">
+      <button class="opt" data-a="yes">✅ Yes, that's it</button>
+      <button class="opt" data-a="again">🔄 Nope, guess again</button>
+      <button class="opt" data-a="tell">✍️ I'll tell you</button>
+    </div>
+    <div class="tell" id="tell"><input id="what" placeholder="e.g. face wash" maxlength="30" aria-label="What is on your keyboard"><button class="opt" data-a="submit">Done</button></div>
+  </div>
+
+  <div class="stage" id="s3">
+    <span class="badge">🚑 Rescue dispatched</span>
+    <p class="mono">Please wiggle gently. Do not negotiate with the key. Dignity has been notified.</p>
+    <div class="opts"><button class="opt" data-a="freed">🎉 Freed!</button></div>
+  </div>
+
+  <div class="stage" id="s4">
+    <div class="file" id="file">
+      <div class="ex mono" id="ex"></div>
+      <div class="name mono" id="verdict"></div>
+      <div class="stamp">CASE CLOSED</div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  var dp=[],held={},open=false,threshold=5000,gi=0,label='',start=0,timer=0,cases=[];
+  var $=function(i){return document.getElementById(i)},card=$('card');
+  var guesses=['the AC remote 📺❄️','a jar of face cream 🧴','a face wash bottle 🫧','a half-eaten biscuit 🍪','a very heavy banana 🍌','your phone, face down, plotting 📱'];
+  function nice(e){var k=e.key;if(k===' ')return 'SPACE';if(k.length===1)return k.toUpperCase();return k.replace('Arrow','').toUpperCase()}
+  function secs(){return Math.max(1,Math.floor((Date.now()-start)/1000))}
+  function stage(n){['s1','s2','s3','s4'].forEach(function(s){$(s).classList.toggle('on',s===n)});card.classList.remove('shake');void card.offsetWidth;card.classList.add('shake')}
+  function popup(l,s){open=true;label=l;start=s;$('kn').textContent=l;$('secs').textContent=secs();stage('s1');card.classList.add('show')}
+  function hunch(){$('hunch').textContent='Our hunch: '+guesses[gi%guesses.length]}
+  function esc(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML}
+  function render(){
+    $('rows').innerHTML=cases.length?cases.map(function(c){return '<div class="row"><b>'+c.t+'</b> · Anonymous · '+esc(c.k)+' held '+c.s+'s<br>Outcome: '+esc(c.o)+'</div>'}).join(''):'<div class="empty">No cases yet. Trigger one and it appears here.</div>';
+  }
+  function closeCase(outcome,line){
+    cases.unshift({t:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),k:label,s:secs(),o:outcome});render();
+    $('ex').textContent='Exhibit A · '+label+' · '+secs()+'s';$('verdict').textContent=line;
+    stage('s4');$('file').classList.remove('on');void $('file').offsetWidth;$('file').classList.add('on');
+    clearTimeout(timer);timer=setTimeout(function(){card.classList.remove('show');setTimeout(function(){open=false},700)},3800);
+  }
+  card.addEventListener('click',function(e){
+    var b=e.target.closest('.opt');if(!b)return;var a=b.dataset.a;b.blur();
+    if(a==='typing')closeCase('Typing','Human, typing. Allegedly. Very long "aaaaaa".');
+    else if(a==='finger')stage('s3');
+    else if(a==='freed')closeCase('Finger stuck, freed','Finger released. Dignity mostly intact.');
+    else if(a==='object'){gi=Math.floor(Math.random()*guesses.length);hunch();stage('s2')}
+    else if(a==='again'){gi++;hunch()}
+    else if(a==='yes'){var g=guesses[gi%guesses.length].replace(/ [^\w ]+.*$/,'').replace(/^(a|an|the) /,'');closeCase('Object: '+g,'Suspect: '+g+'. Sentenced to the drawer.')}
+    else if(a==='tell'){$('tell').classList.add('on');$('what').focus()}
+    else if(a==='submit'){var v=$('what').value.trim()||'something mysterious';$('what').value='';$('tell').classList.remove('on');closeCase('Object: '+v,'Suspect: '+v+'. We would never have guessed.')}
+  });
+  $('what').addEventListener('keydown',function(e){e.stopPropagation();if(e.key==='Enter')card.querySelector('[data-a=submit]').click()});
+  window.addEventListener('keydown',function(e){
+    if(e.target.tagName==='INPUT'||(e.target.tagName==='BUTTON'&&e.key===' '))return;
+    if(!e.repeat&&(e.key==='d'||e.key==='D')){
+      var n=Date.now();dp=dp.filter(function(x){return n-x<1200});dp.push(n);
+      if(dp.length>=3){dp=[];var bar=document.querySelector('.bar');bar.classList.toggle('on');}
+    }
+    if(!held[e.code])held[e.code]={t:Date.now(),l:nice(e),done:false};
+  });
+  window.addEventListener('keyup',function(e){delete held[e.code]});
+  window.addEventListener('blur',function(){held={}});
+  setInterval(function(){
+    var now=Date.now(),c,lg=null;
+    for(c in held)if(now-held[c].t>=threshold&&!held[c].done&&(!lg||held[c].t<lg.t))lg=held[c];
+    if(lg&&!open){lg.done=true;popup(lg.l,lg.t)}
+    if(open&&$('s1').classList.contains('on')){var st=false;for(c in held)if(held[c].l===label)st=true;if(st)$('secs').textContent=secs()}
+  },250);
+  document.querySelectorAll('.bar [data-t]').forEach(function(b){b.onclick=function(){threshold=+b.dataset.t*1000;document.querySelectorAll('.bar [data-t]').forEach(function(x){x.classList.toggle('on',x===b)})}});
+  $('sim').onclick=function(){this.blur();if(!open)popup('SHIFT',Date.now()-12000)};
+  $('dg').onclick=function(){this.blur();$('digest').classList.toggle('off')};
+  render();
+})();
+</script>
+</body>
+</html>
